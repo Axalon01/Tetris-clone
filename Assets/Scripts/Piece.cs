@@ -40,7 +40,25 @@ public class Piece : MonoBehaviour
             Move(Vector2Int.right);
         }
 
+        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            Move(Vector2Int.down);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            HardDrop();
+        }
+
         this.board.Set(this);   // Sets pieces in new position
+    }
+
+    private void HardDrop()
+    {
+        while (Move(Vector2Int.down))
+        {
+            continue;
+        }
     }
 
     private bool Move(Vector2Int translation)
