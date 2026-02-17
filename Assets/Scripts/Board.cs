@@ -46,7 +46,7 @@ public class Board : MonoBehaviour
 
         this.activePiece.Initialize(this, this.spawnPosition, data);
 
-        if (isValidPosition(this.activePiece, this.spawnPosition))
+        if (IsValidPosition(this.activePiece, this.spawnPosition))
         {
             Set(this.activePiece);
         }
@@ -79,7 +79,7 @@ public class Board : MonoBehaviour
         }
     }
 
-    public bool isValidPosition(Piece piece, Vector3Int position)
+    public bool IsValidPosition(Piece piece, Vector3Int position)
     {
         RectInt bounds = this.Bounds;
 

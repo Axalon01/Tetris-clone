@@ -122,7 +122,7 @@ public class Piece : MonoBehaviour
         newPosition.x += translation.x; // Add horizontal movement (-1 for left, +1 for right)
         newPosition.y += translation.y; // Add vertical movement (for falling)
 
-        bool valid = this.board.isValidPosition(this, newPosition);
+        bool valid = this.board.IsValidPosition(this, newPosition);
 
         if (valid)
         {
