@@ -789,6 +789,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5ebc6f5200d545faaa9bdcba0147097, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Piece
+  stepDelay: 1
+  lockDelay: 0.5
 --- !u!114 &1964495135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -804,19 +806,27 @@ MonoBehaviour:
   tetrominoes:
   - tetromino: 0
     tile: {fileID: 11400000, guid: 97092c0d63518404da7af4fd46c216fb, type: 2}
-  - tetromino: 0
+    cells: []
+  - tetromino: 1
     tile: {fileID: 11400000, guid: c72aa15ba4d5b433292abb6059aff72b, type: 2}
-  - tetromino: 0
+    cells: []
+  - tetromino: 2
     tile: {fileID: 11400000, guid: 6d417a06b778e42d29dc9c3011f7e913, type: 2}
-  - tetromino: 0
+    cells: []
+  - tetromino: 3
     tile: {fileID: 11400000, guid: f4ad5ffd3b64e48a59b0a4217ecc27af, type: 2}
+    cells: []
   - tetromino: 0
     tile: {fileID: 11400000, guid: 879944296222147e6b2d52d90f69e1ee, type: 2}
-  - tetromino: 0
+    cells: []
+  - tetromino: 4
     tile: {fileID: 11400000, guid: 86c2e71c12b094845b78daf46619c462, type: 2}
-  - tetromino: 0
+    cells: []
+  - tetromino: 6
     tile: {fileID: 11400000, guid: 7564af12595a249168305935501b0250, type: 2}
-  spawnPosition: {x: 0, y: 0, z: 0}
+    cells: []
+  spawnPosition: {x: -1, y: 8, z: 0}
+  boardSize: {x: 10, y: 20}
 --- !u!1 &1970681324
 GameObject:
   m_ObjectHideFlags: 0
