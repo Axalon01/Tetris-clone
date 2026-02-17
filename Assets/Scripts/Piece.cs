@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 public class Piece : MonoBehaviour
@@ -8,12 +9,20 @@ public class Piece : MonoBehaviour
     public Vector3Int position { get; private set; }
     public int rotationIndex { get; private set; }
 
+    public float stepDelay = 1f;
+    public float lockDelay = 0.5f;
+
+    private float stepTime;
+    private float lockTime;
+
     public void Initialize(Board board, Vector3Int position, TetrominoData data)
     {
         this.board = board;     // Shows which board it's on
         this.position = position;       // Shows the position it's currently at
         this.data = data;       // Shows what piece it's shaped like
         this.rotationIndex = 0; // Resets the rotation to 0 on initialization
+        this.stepTime = Time.time + this.stepDelay; // Sets the step time to the current time plus the step delay (so it will fall after the step delay)
+        this.lockTime = 0f;      // Resets the lock time to 0 on initialization
 
         if (this.cells == null)
         {
@@ -32,6 +41,8 @@ public class Piece : MonoBehaviour
         if (this.cells == null || this.cells.Length == 0) return;  // Don't update if not initialized
 
         this.board.Clear(this); // Clears old positions on board when pieces move
+
+        this.lockTime += Time.deltaTime; // Increments lock time by the time since the last frame
 
         if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.UpArrow))
         {
@@ -67,7 +78,30 @@ public class Piece : MonoBehaviour
             HardDrop();
         }
 
+        if (Time.time >= this.stepTime)
+        {
+            Step();
+        }
+
         this.board.Set(this);   // Sets pieces in new position
+    }
+
+    private void Step()
+    {
+        this.stepTime = Time.time + this.stepDelay; // Resets the step time to the current time plus the step delay (so it will fall after the step delay)
+
+        Move(Vector2Int.down);
+
+        if (this.lockTime >= this.lockDelay)
+        {
+            Lock();
+        }
+    }
+
+    private void Lock()
+    {
+        this.board.Set(this);   // Sets the piece in its final position on the board
+        this.board.SpawnPiece(); // Spawns a new piece
     }
 
     private void HardDrop()
@@ -76,6 +110,8 @@ public class Piece : MonoBehaviour
         {
             continue;
         }
+
+        Lock();
     }
 
     private bool Move(Vector2Int translation)
@@ -90,6 +126,7 @@ public class Piece : MonoBehaviour
         if (valid)
         {
             this.position = newPosition;
+            this.lockTime = 0f; // Reset lock time on successful move
         }
         return valid;
     }
