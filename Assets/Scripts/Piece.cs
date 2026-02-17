@@ -101,6 +101,7 @@ public class Piece : MonoBehaviour
     private void Lock()
     {
         this.board.Set(this);   // Sets the piece in its final position on the board
+        this.board.ClearLines(); // Clears any lines that are completed by this piece
         this.board.SpawnPiece(); // Spawns a new piece
     }
 
