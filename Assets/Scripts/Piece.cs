@@ -96,11 +96,23 @@ public class Piece : MonoBehaviour
 
     private void Rotate(int direction)
     {
+        int originalRotationIndex = this.rotationIndex;
         this.rotationIndex = Wrap(this.rotationIndex + direction, 0, 4); // Wraps the rotation index between 0 and 3
 
+        ApplyRotationMatrix(direction);
+
+        if (!TestWallKicks(this.rotationIndex, direction))
+        {
+            this.rotationIndex = originalRotationIndex; // If rotation isn't valid, reset the rotation index
+            ApplyRotationMatrix(-direction); // Rotate back to original position
+        }
+    }
+
+    private void ApplyRotationMatrix(int direction)
+    {
         for (int i = 0; i < this.cells.Length; i++)
         {
-            Vector3 cell = this.cells[i];
+            Vector3 cell = this.cells[i];   // Get the current cell position (e.g., (1, 0, 0)). This creates a copy of that cell's position.
 
             int x, y;
 
@@ -122,6 +134,35 @@ public class Piece : MonoBehaviour
 
             this.cells[i] = new Vector3Int(x, y, 0);
         }
+    }
+
+    private bool TestWallKicks(int rotationIndex, int rotationDirection)
+    {
+        int wallKickIndex = GetWallKickIndex(rotationIndex, rotationDirection);
+
+        for (int i = 0; i < this.data.wallKicks.GetLength(1); i++)
+        {
+            Vector2Int translation = this.data.wallKicks[wallKickIndex, i];
+
+            if (Move(translation))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private int GetWallKickIndex(int rotationIndex, int rotationDirection)
+    {
+        int wallKickIndex = rotationIndex * 2; // Each rotation index has 2 wall kick tests (one for clockwise, one for counterclockwise)
+
+        if (rotationDirection < 0) // If rotating counterclockwise, we need to test the previous rotation index's wall kicks
+        {
+            wallKickIndex -= 1;
+        }
+
+        return Wrap(wallKickIndex, 0, this.data.wallKicks.GetLength(0)); // Wrap the wall kick index to stay within bounds of the wall kick array
     }
 
     private int Wrap(int input, int min, int max)
