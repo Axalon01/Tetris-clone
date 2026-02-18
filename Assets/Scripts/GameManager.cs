@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -11,6 +12,9 @@ public class GameManager : MonoBehaviour
     private float setVolume;
     public AudioSource lockSound;
     public AudioSource lineClearSound;
+
+    public int level = 1;
+    public int linesCleared = 0;
 
     private void Awake()
     {
@@ -54,6 +58,35 @@ public class GameManager : MonoBehaviour
             Time.timeScale = 1; // Unpause
             pausePanel.SetActive(false); // Hide pause panel
             musicSource.volume = setVolume; // Restore original volume when unpausing
+        }
+    }
+
+    public void AddClearedLines(int count)
+    {
+        linesCleared += count; // Increment total lines cleared by the count of lines just cleared
+
+        // Every 10 lines, increase level
+        int newLevel = (linesCleared / 10) + 1; // Calculate new level based on lines cleared
+        if (newLevel > level)
+        {
+            level = newLevel; // Update level if it has increased
+            IncreaseDifficulty();
+        }
+    }
+
+    private void IncreaseDifficulty()
+    {
+        UnityEngine.Debug.Log("Level up! Current level: " + level);     // Delete this later when I make an actual level display
+
+        // Calculate new step delay based on level
+        // Formula: Start at 1.0 seconds, decrease by 0.1 seconds per level, with a minimum of 0.1 seconds
+        float newDelay = Mathf.Max(1.0f - (level * 0.1f), 0.1f);
+
+        // Tell the active piece to update
+        Board board = FindFirstObjectByType<Board>();
+        if (board != null && board.activePiece != null)
+        {
+            board.activePiece.UpdateStepDelay(newDelay);
         }
     }
 }

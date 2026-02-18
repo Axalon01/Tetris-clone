@@ -105,18 +105,26 @@ public class Board : MonoBehaviour
     {
         RectInt bounds = this.Bounds;
         int row = bounds.yMin;
+        int linesCleared = 0;   // Track how many lines are cleared
 
         while (row < bounds.yMax)
         {
             if (IsLineFull(row))
             {
                 LineClear(row);
-                GameManager.instance.lineClearSound.Play(); // Play line clear sound when a line is cleared
+                linesCleared++; // Increment the count of lines cleared
             }
             else
             {
                 row++;
             }
+        }
+
+        // If any lines were cleared, tell GameManger
+        if (linesCleared > 0)
+        {
+            GameManager.instance.lineClearSound.Play(); // Play line clear sound when a line is cleared
+            GameManager.instance.AddClearedLines(linesCleared);
         }
     }
 

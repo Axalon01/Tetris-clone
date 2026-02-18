@@ -9,11 +9,11 @@ public class Piece : MonoBehaviour
     public Vector3Int position { get; private set; }
     public int rotationIndex { get; private set; }
 
-    public float stepDelay = 1f;
-    public float lockDelay = 0.5f;
+    public float stepDelay = 1f;        // How long between automatic piece drops
+    public float lockDelay = 0.5f;      // How long a piece sits before locking
 
-    private float stepTime;
-    private float lockTime;
+    private float stepTime;     // Time before the next drop should happen
+    private float lockTime;     // Tracks how long the piece has been grounded
     private int moveCount = 0;
     private const int MaxMovesBeforeLockReset = 15;
 
@@ -239,5 +239,10 @@ public class Piece : MonoBehaviour
         {
             return min + (input - min) % (max - min);
         }
+    }
+
+    public void UpdateStepDelay(float newStepDelay)
+    {
+        this.stepDelay = newStepDelay;
     }
 }
