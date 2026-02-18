@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
 
     public int level = 1;
     public int linesCleared = 0;
+    public int score = 0;
 
     private void Awake()
     {
@@ -88,5 +89,29 @@ public class GameManager : MonoBehaviour
         {
             board.activePiece.UpdateStepDelay(newDelay);
         }
+    }
+
+    public void AddScore(int linesCleared)
+    {
+        int points = 0;
+
+        switch (linesCleared)
+        {
+            case 1:
+                points = 100;
+                break;
+            case 2:
+                points = 300;
+                break;
+            case 3:
+                points = 500;
+                break;
+            case 4:
+                points = 800;
+                break;
+        }
+
+        score += points;
+        UnityEngine.Debug.Log($"Cleared {linesCleared} lines for {points} points. Total score: {score}");
     }
 }
