@@ -111,6 +111,7 @@ public class Board : MonoBehaviour
             if (IsLineFull(row))
             {
                 LineClear(row);
+                GameManager.instance.lineClearSound.Play(); // Play line clear sound when a line is cleared
             }
             else
             {

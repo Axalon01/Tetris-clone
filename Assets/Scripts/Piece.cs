@@ -14,6 +14,8 @@ public class Piece : MonoBehaviour
 
     private float stepTime;
     private float lockTime;
+    private int moveCount = 0;
+    private const int MaxMovesBeforeLockReset = 15;
 
 
     public void Initialize(Board board, Vector3Int position, TetrominoData data)
@@ -24,6 +26,7 @@ public class Piece : MonoBehaviour
         this.rotationIndex = 0; // Resets the rotation to 0 on initialization
         this.stepTime = Time.time + this.stepDelay; // Sets the step time to the current time plus the step delay (so it will fall after the step delay)
         this.lockTime = 0f;      // Resets the lock time to 0 on initialization
+        this.moveCount = 0;     // Resets the move count to 0 on initialization
 
         if (this.cells == null)
         {
@@ -102,6 +105,7 @@ public class Piece : MonoBehaviour
 
     private void Lock()
     {
+        GameManager.instance.lockSound.Play(); // Play lock sound when piece locks in place
         this.board.Set(this);   // Sets the piece in its final position on the board
         this.board.ClearLines(); // Clears any lines that are completed by this piece
         this.board.SpawnPiece(); // Spawns a new piece
@@ -129,7 +133,27 @@ public class Piece : MonoBehaviour
         if (valid)
         {
             this.position = newPosition;
-            this.lockTime = 0f; // Reset lock time on successful move
+
+            // Check if piec is grounded (can't move down anymore)
+            Vector3Int below = this.position;
+            below.y -= 1;
+            bool isGrounded = !this.board.IsValidPosition(this, below);
+
+            if (isGrounded)
+            {
+                moveCount++;
+
+                // Only reset lock timer if under move limit
+                if (moveCount <= MaxMovesBeforeLockReset)
+                {
+                    this.lockTime = 0f; // Reset lock time when piece is grounded and has moved less than the max moves before lock reset
+                }
+            }
+            else
+            {
+                moveCount = 0; // Reset move count when piece is not grounded
+                this.lockTime = 0f; // Reset lock time
+            }
         }
         return valid;
     }

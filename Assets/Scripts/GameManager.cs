@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
 
     public bool isPaused { get; private set; }
     private float setVolume;
+    public AudioSource lockSound;
+    public AudioSource lineClearSound;
 
     private void Awake()
     {
@@ -42,9 +44,9 @@ public class GameManager : MonoBehaviour
             pausePanel.SetActive(true); // Show pause panel
 
             setVolume = musicSource.volume;     // Store the current volume before changing it
-            if (musicSource.volume > 0.2f)
+            if (musicSource.volume > 0.1f)
             {
-                musicSource.volume = 0.2f;
+                musicSource.volume = 0.1f;
             }
         }
         else
