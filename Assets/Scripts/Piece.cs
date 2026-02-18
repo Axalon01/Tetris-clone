@@ -15,6 +15,7 @@ public class Piece : MonoBehaviour
     private float stepTime;
     private float lockTime;
 
+
     public void Initialize(Board board, Vector3Int position, TetrominoData data)
     {
         this.board = board;     // Shows which board it's on
@@ -37,6 +38,7 @@ public class Piece : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.instance.isPaused) return; // If the game is paused, skip the rest of the update loop
 
         if (this.cells == null || this.cells.Length == 0) return;  // Don't update if not initialized
 
