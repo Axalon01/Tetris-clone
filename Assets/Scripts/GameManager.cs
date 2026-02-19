@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using UnityEngine;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,6 +17,8 @@ public class GameManager : MonoBehaviour
     public int level = 1;
     public int linesCleared = 0;
     public int score = 0;
+    public TextMeshPro scoreText;
+    public TextMeshPro levelText;
 
     private void Awake()
     {
@@ -71,14 +74,13 @@ public class GameManager : MonoBehaviour
         if (newLevel > level)
         {
             level = newLevel; // Update level if it has increased
+            levelText.text = level.ToString(); // Update level display
             IncreaseDifficulty();
         }
     }
 
     private void IncreaseDifficulty()
     {
-        UnityEngine.Debug.Log("Level up! Current level: " + level);     // Delete this later when I make an actual level display
-
         // Calculate new step delay based on level
         // Formula: Start at 1.0 seconds, decrease by 0.1 seconds per level, with a minimum of 0.1 seconds
         float newDelay = Mathf.Max(1.0f - (level * 0.1f), 0.1f);
@@ -112,6 +114,6 @@ public class GameManager : MonoBehaviour
         }
 
         score += points;
-        UnityEngine.Debug.Log($"Cleared {linesCleared} lines for {points} points. Total score: {score}");
+        scoreText.text = score.ToString();  // Update score display
     }
 }
