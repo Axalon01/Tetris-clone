@@ -16,6 +16,8 @@ public class Piece : MonoBehaviour
     private float lockTime;     // Tracks how long the piece has been grounded
     private int moveCount = 0;
     private const int MaxMovesBeforeLockReset = 15;
+    private float moveDelay = 0.1f;    // Minimum time between repeat moves
+    private float lastMoveTime;    // Time when the last move was made
 
 
     public void Initialize(Board board, Vector3Int position, TetrominoData data)
@@ -49,6 +51,7 @@ public class Piece : MonoBehaviour
 
         this.lockTime += Time.deltaTime; // Increments lock time by the time since the last frame
 
+
         if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.UpArrow))
         {
             Rotate(-1);  // Rotate counterclockwise
@@ -64,18 +67,39 @@ public class Piece : MonoBehaviour
             this.Rotate(1);   // Rotate clockwise
         }
 
+
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             Move(Vector2Int.left);  // Calls Move and passes in where I want to move as a parameter ((-1, 0) in this case)
+            lastMoveTime = Time.time; // Update last move time to the current time after a successful move
         }
-        else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+        else if ((Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) && Time.time >= lastMoveTime + moveDelay) // If enough time has passed since the last move, allow for repeat movement when holding down the key
+        {
+            // Hold down key to move at intervals
+            Move(Vector2Int.left);
+            lastMoveTime = Time.time;
+        }
+
+        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
         {
             Move(Vector2Int.right);
+            lastMoveTime = Time.time;
+        }
+        else if ((Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) && Time.time >= lastMoveTime + moveDelay)
+        {
+            Move(Vector2Int.right);
+            lastMoveTime = Time.time;
         }
 
         if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
         {
             Move(Vector2Int.down);
+            lastMoveTime = Time.time;
+        }
+        else if ((Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) && Time.time >= lastMoveTime + moveDelay)
+        {
+            Move(Vector2Int.down);
+            lastMoveTime = Time.time;
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -134,7 +158,7 @@ public class Piece : MonoBehaviour
         {
             this.position = newPosition;
 
-            // Check if piec is grounded (can't move down anymore)
+            // Check if piece is grounded (can't move down anymore)
             Vector3Int below = this.position;
             below.y -= 1;
             bool isGrounded = !this.board.IsValidPosition(this, below);

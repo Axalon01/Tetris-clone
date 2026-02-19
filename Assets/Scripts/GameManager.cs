@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour
 
     private void TogglePause()
     {
-        isPaused = !isPaused; // Toggles the pause state ny flipping isPaused to whatever it's not
+        isPaused = !isPaused; // Toggles the pause state by flipping isPaused to whatever it's not
 
         if (isPaused)
         {
@@ -114,6 +114,8 @@ public class GameManager : MonoBehaviour
         }
 
         score += points;
+        score = Mathf.Min(score, 99999);    // Cap score at 99999 to prevent overflow
+
         scoreText.text = score.ToString();  // Update score display
     }
 }
