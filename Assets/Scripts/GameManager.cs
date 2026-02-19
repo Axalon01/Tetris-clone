@@ -1,5 +1,5 @@
-using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class GameManager : MonoBehaviour
@@ -19,6 +19,9 @@ public class GameManager : MonoBehaviour
     public int score = 0;
     public TextMeshPro scoreText;
     public TextMeshPro levelText;
+    public GameObject gameOverPanel;
+    public bool isGameOver { get; private set; }
+    public Button playAgainButton;
 
     private void Awake()
     {
@@ -91,6 +94,41 @@ public class GameManager : MonoBehaviour
         {
             board.activePiece.UpdateStepDelay(newDelay);
         }
+    }
+
+    public void GameOver()
+    {
+        isGameOver = true;
+        gameOverPanel.SetActive(true); // Show game over panel before freezing time
+
+        // Make the PlayAgainButton selected by default
+        UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(playAgainButton.gameObject);
+    }
+
+    public void PlayAgain()
+    {
+        isGameOver = false;
+        Time.timeScale = 1; // Resume the game
+        gameOverPanel.SetActive(false); // Hide game over panel
+
+        // Reset game state
+        score = 0;
+        level = 1;
+        linesCleared = 0;
+
+        // Update UI
+        scoreText.text = "0";
+        levelText.text = "1";
+
+        // Clear the board
+        Board board = FindFirstObjectByType<Board>();
+        board.tilemap.ClearAllTiles();
+        board.SpawnPiece();
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 
     public void AddScore(int linesCleared)

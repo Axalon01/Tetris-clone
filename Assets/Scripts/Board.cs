@@ -51,13 +51,8 @@ public class Board : MonoBehaviour
         }
         else
         {
-            GameOver();
+            GameManager.instance.GameOver();
         }
-    }
-
-    private void GameOver()
-    {
-        this.tilemap.ClearAllTiles();
     }
 
     public void Set(Piece piece)

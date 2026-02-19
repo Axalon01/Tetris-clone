@@ -43,6 +43,8 @@ public class Piece : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.instance.isGameOver) return; // If the game is over, skip the rest of the update loop
+
         if (GameManager.instance.isPaused) return; // If the game is paused, skip the rest of the update loop
 
         if (this.cells == null || this.cells.Length == 0) return;  // Don't update if not initialized
@@ -132,7 +134,11 @@ public class Piece : MonoBehaviour
         GameManager.instance.lockSound.Play(); // Play lock sound when piece locks in place
         this.board.Set(this);   // Sets the piece in its final position on the board
         this.board.ClearLines(); // Clears any lines that are completed by this piece
-        this.board.SpawnPiece(); // Spawns a new piece
+
+        if (!GameManager.instance.isGameOver) // Only spawn a new piece if the game isn't over
+        {
+            this.board.SpawnPiece(); // Spawns a new piece after locking the current piece in place
+        }
     }
 
     private void HardDrop()
