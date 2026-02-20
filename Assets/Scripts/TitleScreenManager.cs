@@ -42,7 +42,7 @@ public class TitleScreenManager : MonoBehaviour
 
     private IEnumerator StartGameSequence()
     {
-        // Fade out of tile panel
+        // Fade out of title panel
         CanvasGroup titleCanvasGroup = titlePanel.GetComponent<CanvasGroup>();
         if (titleCanvasGroup == null)
             titleCanvasGroup = titlePanel.AddComponent<CanvasGroup>();
@@ -60,7 +60,7 @@ public class TitleScreenManager : MonoBehaviour
         titleCanvasGroup.alpha = 0f;
         titlePanel.SetActive(false); // Hide title panel
 
-        // Fade out grey cover, info panel cover, and fade in info panel simultaneously
+        // Fade out grey cover, info panel cover
         elapsed = 0f;
         CanvasGroup coverCanvasGroup = greyCoverPanel.GetComponent<CanvasGroup>();
         if (coverCanvasGroup == null)

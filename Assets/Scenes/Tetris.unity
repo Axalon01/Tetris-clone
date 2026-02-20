@@ -2604,7 +2604,6 @@ MonoBehaviour:
   titlePanel: {fileID: 1985680808}
   greyCoverPanel: {fileID: 1161551740}
   infoPanelCover: {fileID: 1434750619}
-  infoPanelCanvasGroup: {fileID: 1078455593}
   board: {fileID: 1964495135}
   musicSource: {fileID: 1239127787}
   playButton: {fileID: 1783545263}
