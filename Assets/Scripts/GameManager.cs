@@ -17,8 +17,8 @@ public class GameManager : MonoBehaviour
     public int level = 1;
     public int linesCleared = 0;
     public int score = 0;
-    public TextMeshPro scoreText;
-    public TextMeshPro levelText;
+    public TMPro.TextMeshProUGUI scoreText;
+    public TMPro.TextMeshProUGUI levelText;
     public GameObject gameOverPanel;
     public bool isGameOver { get; private set; }
     public Button playAgainButton;
@@ -138,7 +138,7 @@ public class GameManager : MonoBehaviour
         switch (linesCleared)
         {
             case 1:
-                points = 100;
+                points = 100000;
                 break;
             case 2:
                 points = 300;
@@ -152,7 +152,6 @@ public class GameManager : MonoBehaviour
         }
 
         score += points;
-        score = Mathf.Min(score, 99999);    // Cap score at 99999 to prevent overflow
 
         scoreText.text = score.ToString();  // Update score display
     }
