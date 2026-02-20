@@ -43,6 +43,7 @@ public class Piece : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.instance == null) return; // If GameManager instance doesn't exist yet, skip the rest of the update loop
         if (GameManager.instance.isGameOver) return; // If the game is over, skip the rest of the update loop
 
         if (GameManager.instance.isPaused) return; // If the game is paused, skip the rest of the update loop
