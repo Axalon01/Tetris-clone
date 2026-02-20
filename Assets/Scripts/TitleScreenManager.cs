@@ -8,7 +8,6 @@ public class TitleScreenManager : MonoBehaviour
     public GameObject titlePanel;
     public GameObject greyCoverPanel;
     public GameObject infoPanelCover;
-    public CanvasGroup infoPanelCanvasGroup;
     public Board board;
     public AudioSource musicSource;
     public Button playButton;
@@ -33,6 +32,7 @@ public class TitleScreenManager : MonoBehaviour
     public void OnControlsButtonClicked()
     {
         UnityEngine.Debug.Log("Controls button clicked");
+        // Need to update this!
     }
 
     public void OnQuitButtonClicked()
@@ -47,7 +47,7 @@ public class TitleScreenManager : MonoBehaviour
         if (titleCanvasGroup == null)
             titleCanvasGroup = titlePanel.AddComponent<CanvasGroup>();
 
-        float duration = 0.5f;
+        float duration = 0.6f;
         float elapsed = 0f;
 
         while (elapsed < duration)
@@ -77,13 +77,11 @@ public class TitleScreenManager : MonoBehaviour
 
             coverCanvasGroup.alpha = 1f - progress; // Fade out grey title cover
             infoCoverCanvasGroup.alpha = 1f - progress; // Fade out info panel cover
-            infoPanelCanvasGroup.alpha = progress; // Fade in info panel
 
             yield return null;
         }
 
         coverCanvasGroup.alpha = 0f;
-        infoPanelCanvasGroup.alpha = 1f;
         greyCoverPanel.SetActive(false); // Hide grey cover
 
         // Start the game
