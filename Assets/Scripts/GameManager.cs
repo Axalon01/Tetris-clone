@@ -195,7 +195,7 @@ public class GameManager : MonoBehaviour
         switch (linesCleared)
         {
             case 1:
-                points = 10000;
+                points = 100;
                 break;
             case 2:
                 points = 300;
