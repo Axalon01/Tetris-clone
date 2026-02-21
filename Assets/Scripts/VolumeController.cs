@@ -1,22 +1,33 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class VolumeController : MonoBehaviour
 {
-    public Slider volumeSlider;
-    public AudioSource musicSource;
+    public Slider musicVolumeSlider;
+    public Slider sfxVolumeSlider;
+    public AudioSource musicAudioSource;
+    public AudioSource sfxAudioSource;
 
     private void Start()
     {
         // Set slider to current volume
-        volumeSlider.value = musicSource.volume;
+        musicVolumeSlider.value = musicAudioSource.volume;
+        sfxVolumeSlider.value = sfxAudioSource.volume;
         
         // Listen for changes
-        volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
+        musicVolumeSlider.onValueChanged.AddListener(OnMusicVolumeChanged);
+        sfxVolumeSlider.onValueChanged.AddListener(onSFXVolumeChanged);
     }
 
-    private void OnVolumeChanged(float value)
+    private void onSFXVolumeChanged(float value)
     {
-        musicSource.volume = value;
+        GameManager.instance.menuAudioSource.volume = value;
+        GameManager.instance.sfxAudioSource.volume = value;
+    }
+
+    private void OnMusicVolumeChanged(float value)
+    {
+        musicAudioSource.volume = value;
     }
 }

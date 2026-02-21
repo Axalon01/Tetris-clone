@@ -9,23 +9,28 @@ public class GameManager : MonoBehaviour
     public GameObject pausePanel;
 
     public bool isPaused { get; private set; }
-    public AudioSource lockSound;
-    public AudioSource lineClearSound;
+
+    public AudioClip lockSound;
+    public AudioClip lineClearSound;
+    public Slider sfxVolumeSlider;
+    public AudioClip menuHoverSound;
+    public AudioClip menuSelectSound;
+    public AudioSource menuAudioSource;     // For playing menu sounds
+    public AudioSource sfxAudioSource;      // For playing SFX
 
     public int level = 1;
     public int linesCleared = 0;
     public int score = 0;
+
     public TMPro.TextMeshProUGUI scoreText;
     public TMPro.TextMeshProUGUI levelText;
-    public GameObject gameOverPanel;
+
     public bool isGameOver { get; private set; }
-    public Button playAgainButton;
-    public Slider volumeSlider;
-    public AudioClip menuHoverSound;
-    public AudioClip menuSelectSound;
-    public AudioSource menuAudioSource;     // For playing menu sounds
     private bool gameStarted = false;
+
+    public Button playAgainButton;
     private GameObject lastSelected;
+    public GameObject gameOverPanel;
 
     public void StartGame()     // Call this from TitleScreenManager
     {
@@ -77,7 +82,7 @@ public class GameManager : MonoBehaviour
             pausePanel.SetActive(true); // Show pause panel
 
             // Select the volume slider
-            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(volumeSlider.gameObject);
+            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(musicVolumeSlider.gameObject);
         }
         else
         {

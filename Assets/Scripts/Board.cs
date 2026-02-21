@@ -112,7 +112,7 @@ public class Board : MonoBehaviour
         // If any lines were cleared, tell GameManger
         if (linesCleared > 0)
         {
-            GameManager.instance.lineClearSound.Play(); // Play line clear sound when a line is cleared
+            GameManager.instance.sfxAudioSource.PlayOneShot(GameManager.instance.lineClearSound); // Play line clear sound when a line is cleared
             GameManager.instance.AddClearedLines(linesCleared);
             GameManager.instance.AddScore(linesCleared);
         }

@@ -132,7 +132,7 @@ public class Piece : MonoBehaviour
 
     private void Lock()
     {
-        GameManager.instance.lockSound.Play(); // Play lock sound when piece locks in place
+        GameManager.instance.sfxAudioSource.PlayOneShot(GameManager.instance.lockSound); // Play lock sound when piece locks in place
         this.board.Set(this);   // Sets the piece in its final position on the board
         this.board.ClearLines(); // Clears any lines that are completed by this piece
 
