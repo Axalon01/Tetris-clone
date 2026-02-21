@@ -8,45 +8,66 @@ public class TitleScreenManager : MonoBehaviour
     public GameObject titlePanel;
     public GameObject greyCoverPanel;
     public GameObject infoPanelCover;
+    public GameObject controlsPanel;
     public Board board;
     public AudioSource musicSource;
     public Button playButton;
     public TextMeshProUGUI playGameText;
     public TextMeshProUGUI controlsText;
     public TextMeshProUGUI quitText;
+    public Button controlsButton;
+    
+    private CanvasGroup titleCanvasGroup;
+    private CanvasGroup controlsCanvasGroup;
 
     private void Start()
     {
         // Everything starts in title screen state
         Time.timeScale = 0; // Pause the game
 
+        // Get/add CanvasGroups once
+        titleCanvasGroup = titlePanel.GetComponent<CanvasGroup>();
+        if (titleCanvasGroup == null)
+            titleCanvasGroup = titlePanel.AddComponent<CanvasGroup>();
+    
+        controlsCanvasGroup = controlsPanel.GetComponent<CanvasGroup>();
+        if (controlsCanvasGroup == null)
+            controlsCanvasGroup = controlsPanel.AddComponent<CanvasGroup>();
+
         // Select PlayButton by default
         UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(playButton.gameObject);
     }
 
+    private void Update()
+    {
+        // Check if ESC is pressed while on controls screen
+        if (Input.GetKeyDown(KeyCode.Escape) && controlsPanel.activeSelf)
+        {
+            StartCoroutine(FadePanels(controlsCanvasGroup, controlsPanel, titleCanvasGroup, titlePanel, 0.6f));
+        }
+    }
+
     public void OnPlayButtonClicked()
     {
+        GameManager.instance.menuAudioSource.PlayOneShot(GameManager.instance.menuSelectSound);
         StartCoroutine(StartGameSequence());
     }
 
     public void OnControlsButtonClicked()
     {
-        UnityEngine.Debug.Log("Controls button clicked");
-        // Need to update this!
+        GameManager.instance.menuAudioSource.PlayOneShot(GameManager.instance.menuSelectSound);
+        StartCoroutine(FadePanels(titleCanvasGroup, titlePanel, controlsCanvasGroup, controlsPanel, 0.6f));
     }
 
     public void OnQuitButtonClicked()
     {
+        GameManager.instance.menuAudioSource.PlayOneShot(GameManager.instance.menuSelectSound);
         Application.Quit();
     }
 
     private IEnumerator StartGameSequence()
     {
         // Fade out of title panel
-        CanvasGroup titleCanvasGroup = titlePanel.GetComponent<CanvasGroup>();
-        if (titleCanvasGroup == null)
-            titleCanvasGroup = titlePanel.AddComponent<CanvasGroup>();
-
         float duration = 0.6f;
         float elapsed = 0f;
 
@@ -89,6 +110,52 @@ public class TitleScreenManager : MonoBehaviour
         musicSource.Play(); // Start music when play button is clicked
         board.SpawnPiece(); // Spawn the first piece
         infoPanelCover.SetActive(false); // Hide info panel cover
+
+        GameManager.instance.StartGame();   // Flips the bool in GameManager
+        this.gameObject.SetActive(false);
     }
 
+    private IEnumerator FadePanels(CanvasGroup fadeOut, GameObject fadeOutObj, CanvasGroup fadeIn, GameObject fadeInObj, float duration)
+    {
+        float elapsed = 0f;
+
+        // Fade out
+        if (fadeOut != null)
+        {
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                fadeOut.alpha = 1f - (elapsed / duration);
+                yield return null;
+            }
+            fadeOut.alpha = 0f;
+            if (fadeOutObj != null)
+                fadeOutObj.SetActive(false);
+        }
+
+        // Fade in
+        if (fadeIn != null)
+        {
+            if (fadeInObj != null)
+                fadeInObj.SetActive(true);
+            
+            elapsed = 0f;
+            fadeIn.alpha = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                fadeIn.alpha = elapsed / duration;
+                yield return null;
+            }
+            fadeIn.alpha = 1f;
+        }
+
+        // Re-select appropriate button when fading back to title
+        if (fadeInObj == titlePanel && controlsButton != null)
+{
+        // Coming back to title - select Controls button
+        UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(controlsButton.gameObject);
+}
+    }
 }

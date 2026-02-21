@@ -7,10 +7,8 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;  // Singleton so other scripts can access it
 
     public GameObject pausePanel;
-    public AudioSource musicSource;
 
     public bool isPaused { get; private set; }
-    private float setVolume;
     public AudioSource lockSound;
     public AudioSource lineClearSound;
 
@@ -22,6 +20,17 @@ public class GameManager : MonoBehaviour
     public GameObject gameOverPanel;
     public bool isGameOver { get; private set; }
     public Button playAgainButton;
+    public Slider volumeSlider;
+    public AudioClip menuHoverSound;
+    public AudioClip menuSelectSound;
+    public AudioSource menuAudioSource;     // For playing menu sounds
+    private bool gameStarted = false;
+    private GameObject lastSelected;
+
+    public void StartGame()     // Call this from TitleScreenManager
+    {
+        gameStarted = true;
+    }
 
     private void Awake()
     {
@@ -38,12 +47,25 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        // Check for pause input
-        if (Input.GetKeyDown(KeyCode.Escape))
+        // Only allow pause during gameplay (not on title screen)
+        if (Input.GetKeyDown(KeyCode.Escape) && gameStarted && !isGameOver)
         {
             TogglePause();
         }
+
+        // Play hover sound when selection changes for Game Over buttons
+        if (isGameOver)
+    {
+        GameObject currentSelected = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+        
+        if (currentSelected != null && currentSelected != lastSelected)
+        {
+            menuAudioSource.PlayOneShot(menuHoverSound);
+        }
+        
+        lastSelected = currentSelected;
     }
+}
 
     private void TogglePause()
     {
@@ -54,17 +76,13 @@ public class GameManager : MonoBehaviour
             Time.timeScale = 0; // Pause
             pausePanel.SetActive(true); // Show pause panel
 
-            setVolume = musicSource.volume;     // Store the current volume before changing it
-            if (musicSource.volume > 0.1f)
-            {
-                musicSource.volume = 0.1f;
-            }
+            // Select the volume slider
+            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(volumeSlider.gameObject);
         }
         else
         {
             Time.timeScale = 1; // Unpause
             pausePanel.SetActive(false); // Hide pause panel
-            musicSource.volume = setVolume; // Restore original volume when unpausing
         }
     }
 
@@ -103,10 +121,14 @@ public class GameManager : MonoBehaviour
 
         // Make the PlayAgainButton selected by default
         UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(playAgainButton.gameObject);
+
+        // Initialize lastSelected so it doesn't play sound on first frame
+        lastSelected = playAgainButton.gameObject;
     }
 
     public void PlayAgain()
     {
+        GameManager.instance.menuAudioSource.PlayOneShot(GameManager.instance.menuSelectSound);
         isGameOver = false;
         Time.timeScale = 1; // Resume the game
         gameOverPanel.SetActive(false); // Hide game over panel
@@ -128,6 +150,7 @@ public class GameManager : MonoBehaviour
 
     public void QuitGame()
     {
+        GameManager.instance.menuAudioSource.PlayOneShot(GameManager.instance.menuSelectSound);
         Application.Quit();
     }
 
