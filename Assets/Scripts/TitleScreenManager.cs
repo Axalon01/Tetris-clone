@@ -15,6 +15,9 @@ public class TitleScreenManager : MonoBehaviour
     public TextMeshProUGUI playGameText;
     public TextMeshProUGUI controlsText;
     public TextMeshProUGUI quitText;
+    public TextMeshProUGUI highScore1Text;
+    public TextMeshProUGUI highScore2Text;
+    public TextMeshProUGUI highScore3Text;
     public Button controlsButton;
     
     private CanvasGroup titleCanvasGroup;
@@ -33,6 +36,15 @@ public class TitleScreenManager : MonoBehaviour
         controlsCanvasGroup = controlsPanel.GetComponent<CanvasGroup>();
         if (controlsCanvasGroup == null)
             controlsCanvasGroup = controlsPanel.AddComponent<CanvasGroup>();
+            
+        // Load and display high scores
+        int score1 = PlayerPrefs.GetInt("HighScore1", 0);
+        int score2 = PlayerPrefs.GetInt("HighScore2", 0);
+        int score3 = PlayerPrefs.GetInt("HighScore3", 0);
+
+        highScore1Text.text = $"{score1}";
+        highScore2Text.text = $"{score2}";
+        highScore3Text.text = $"{score3}";
 
         // Select PlayButton by default
         UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(playButton.gameObject);

@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
 
     public AudioClip lockSound;
     public AudioClip lineClearSound;
+    public Slider musicVolumeSlider;
     public Slider sfxVolumeSlider;
     public AudioClip menuHoverSound;
     public AudioClip menuSelectSound;
@@ -59,7 +60,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Play hover sound when selection changes for Game Over buttons
-        if (isGameOver)
+        if (isGameOver || isPaused)
     {
         GameObject currentSelected = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
         
@@ -122,6 +123,7 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         isGameOver = true;
+        SaveHighScore(score);       //Check and save the high score
         gameOverPanel.SetActive(true); // Show game over panel before freezing time
 
         // Make the PlayAgainButton selected by default
@@ -129,6 +131,33 @@ public class GameManager : MonoBehaviour
 
         // Initialize lastSelected so it doesn't play sound on first frame
         lastSelected = playAgainButton.gameObject;
+    }
+
+    public void SaveHighScore(int newScore)
+    {
+        // Get existing scores (defaults to 0 if not set)
+        int score1 = PlayerPrefs.GetInt("HighScore1", 0);
+        int score2 = PlayerPrefs.GetInt("HighScore2", 0);
+        int score3 = PlayerPrefs.GetInt("HighScore3", 0);
+
+        // Insert new score in the right position
+        if (newScore > score1)
+        {
+            PlayerPrefs.SetInt("HighScore3", score2);
+            PlayerPrefs.SetInt("HighScore2", score1);
+            PlayerPrefs.SetInt("HighScore1", newScore);
+        }
+        else if (newScore > score2)
+        {
+            PlayerPrefs.SetInt("HighScore3", score2);
+            PlayerPrefs.SetInt("HighScore2", newScore);
+        }
+        else if (newScore > score3)
+        {
+            PlayerPrefs.SetInt("HighScore3", newScore);
+        }
+
+        PlayerPrefs.Save();
     }
 
     public void PlayAgain()
@@ -166,7 +195,7 @@ public class GameManager : MonoBehaviour
         switch (linesCleared)
         {
             case 1:
-                points = 100;
+                points = 10000;
                 break;
             case 2:
                 points = 300;
