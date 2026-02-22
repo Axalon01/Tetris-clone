@@ -97,3 +97,17 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+# Build output files
+*.dll
+*.exe
+*.pdb
+*.so
+*.dylib
+*.bundle
+D3D12/
+MonoBleedingEdge/
+*_BurstDebugInformation_DoNotShip/
+*.assets
+*.json
+*.resS
+*.resource
