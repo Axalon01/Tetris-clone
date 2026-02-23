@@ -8,8 +8,8 @@ public class Board : MonoBehaviour
     public TetrominoData[] tetrominoes;
     public Vector3Int spawnPosition;
     public Vector2Int boardSize = new Vector2Int(10, 20);
-    private TetrominoData heldPiece;
-    private bool hasHeldPiece = false;
+    public TetrominoData heldPiece;
+    public bool hasHeldPiece = false;
     public bool canHold { get; private set; } = true;
 
     public RectInt Bounds   // This is a property, so it gets capitalized. A property looks like a variable, but runs code when accessed.
