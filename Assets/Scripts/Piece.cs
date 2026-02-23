@@ -25,6 +25,7 @@ public class Piece : MonoBehaviour
     private void Awake()
     {
         controls = new TetrisControls();
+        controls.devices = null;
         controls.Gameplay.Pause.performed += ctx =>
         {
             if (GameManager.instance != null && GameManager.instance.gameStarted && !GameManager.instance.isGameOver)
