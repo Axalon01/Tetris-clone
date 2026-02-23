@@ -290,7 +290,7 @@ public partial class @TetrisControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""550953e8-f6c5-49b6-b663-ec414fd3b7e0"",
-                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""path"": ""<Gamepad>/buttonEast"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
