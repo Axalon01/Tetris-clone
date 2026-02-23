@@ -12,8 +12,8 @@ public class VolumeController : MonoBehaviour
     private void Start()
     {
         // Load saved volume (default to 1.0 if not set)
-        float savedMusicVolume = PlayerPrefs.GetFloat("MusicVolume", 0.5f);
-        float savedSFXVolume = PlayerPrefs.GetFloat("SFXVolume", 0.5f);
+        float savedMusicVolume = PlayerPrefs.GetFloat("MusicVolume", 0.3f);
+        float savedSFXVolume = PlayerPrefs.GetFloat("SFXVolume", 0.3f);
 
         // Apply loaded volumes
         musicAudioSource.volume = savedMusicVolume;
@@ -23,14 +23,6 @@ public class VolumeController : MonoBehaviour
         // Set sliders to loaded values
         musicVolumeSlider.value = savedMusicVolume;
         sfxVolumeSlider.value = savedSFXVolume;
-
-        // Set sliders to loaded values
-        musicVolumeSlider.value = savedMusicVolume;
-        sfxVolumeSlider.value = savedSFXVolume;
-
-        // Set slider to current volume
-        musicVolumeSlider.value = musicAudioSource.volume;
-        sfxVolumeSlider.value = sfxAudioSource.volume;
         
         // Listen for changes
         musicVolumeSlider.onValueChanged.AddListener(OnMusicVolumeChanged);

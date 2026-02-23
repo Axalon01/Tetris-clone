@@ -111,3 +111,5 @@ MonoBleedingEdge/
 *.json
 *.resS
 *.resource
+.DS_Store
+.DS_Store

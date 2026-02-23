@@ -7,8 +7,10 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;  // Singleton so other scripts can access it
 
     public GameObject pausePanel;
+    public Board board;
 
     public bool isPaused { get; private set; }
+    public bool gameStarted { get; private set; } = false;
 
     public AudioClip lockSound;
     public AudioClip lineClearSound;
@@ -27,7 +29,6 @@ public class GameManager : MonoBehaviour
     public TMPro.TextMeshProUGUI levelText;
 
     public bool isGameOver { get; private set; }
-    private bool gameStarted = false;
 
     public Button playAgainButton;
     private GameObject lastSelected;
@@ -53,12 +54,6 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        // Only allow pause during gameplay (not on title screen)
-        if (Input.GetKeyDown(KeyCode.Escape) && gameStarted && !isGameOver)
-        {
-            TogglePause();
-        }
-
         // Play hover sound when selection changes for Game Over buttons
         if (isGameOver || isPaused)
     {
@@ -73,7 +68,7 @@ public class GameManager : MonoBehaviour
     }
 }
 
-    private void TogglePause()
+    public void TogglePause()
     {
         isPaused = !isPaused; // Toggles the pause state by flipping isPaused to whatever it's not
 
@@ -110,10 +105,9 @@ public class GameManager : MonoBehaviour
     {
         // Calculate new step delay based on level
         // Formula: Start at 1.0 seconds, decrease by 0.1 seconds per level, with a minimum of 0.1 seconds
-        float newDelay = Mathf.Max(1.0f - (level * 0.1f), 0.1f);
+        float newDelay = Mathf.Max(Mathf.Pow(0.8f - ((level - 1) * 0.007f), level - 1), 0.05f);
 
         // Tell the active piece to update
-        Board board = FindFirstObjectByType<Board>();
         if (board != null && board.activePiece != null)
         {
             board.activePiece.UpdateStepDelay(newDelay);
@@ -177,7 +171,6 @@ public class GameManager : MonoBehaviour
         levelText.text = "1";
 
         // Clear the board
-        Board board = FindFirstObjectByType<Board>();
         board.tilemap.ClearAllTiles();
         board.SpawnPiece();
     }

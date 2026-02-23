@@ -8,6 +8,9 @@ public class Board : MonoBehaviour
     public TetrominoData[] tetrominoes;
     public Vector3Int spawnPosition;
     public Vector2Int boardSize = new Vector2Int(10, 20);
+    private TetrominoData heldPiece;
+    private bool hasHeldPiece = false;
+    public bool canHold { get; private set; } = true;
 
     public RectInt Bounds   // This is a property, so it gets capitalized. A property looks like a variable, but runs code when accessed.
     {
@@ -48,6 +51,36 @@ public class Board : MonoBehaviour
         {
             GameManager.instance.GameOver();
         }
+    }
+
+    public void HoldPiece()
+    {
+        if (!canHold) return;
+
+        if (!hasHeldPiece)
+        {
+            // Nothing held yet: Save current piece and spawn a new random one
+            heldPiece = this.activePiece.data;
+            hasHeldPiece = true;
+            Clear(this.activePiece);
+            SpawnPiece();
+        }
+        else
+        {
+            // Swap current piece with held data
+            TetrominoData temp = this.activePiece.data;
+            Clear(this.activePiece);        // Remove the old piece from the board
+            this.activePiece.Initialize(this, this.spawnPosition, heldPiece);
+            heldPiece = temp;
+            Set(this.activePiece);
+        }
+
+        canHold = false;
+    }
+
+    public void ResetHold()
+    {
+        canHold = true;
     }
 
     public void Set(Piece piece)

@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Piece : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class Piece : MonoBehaviour
     public Vector3Int position { get; private set; }
     public int rotationIndex { get; private set; }
 
-    public float stepDelay = 1f;        // How long between automatic piece drops
+    public float stepDelay = 0.8f;        // How long between automatic piece drops
     public float lockDelay = 0.5f;      // How long a piece sits before locking
 
     private float stepTime;     // Time before the next drop should happen
@@ -19,6 +20,27 @@ public class Piece : MonoBehaviour
     private float moveDelay = 0.1f;    // Minimum time between repeat moves
     private float lastMoveTime;    // Time when the last move was made
 
+    private TetrisControls controls;
+
+    private void Awake()
+    {
+        controls = new TetrisControls();
+        controls.Gameplay.Pause.performed += ctx =>
+        {
+            if (GameManager.instance != null && GameManager.instance.gameStarted && !GameManager.instance.isGameOver)
+        GameManager.instance.TogglePause();
+        };
+    }
+
+    private void OnEnable()
+    {
+        controls.Gameplay.Enable();
+    }
+
+    private void OnDisable()
+    {
+        controls.Gameplay.Disable();
+    }
 
     public void Initialize(Board board, Vector3Int position, TetrominoData data)
     {
@@ -45,9 +67,7 @@ public class Piece : MonoBehaviour
     {
         if (GameManager.instance == null) return; // If GameManager instance doesn't exist yet, skip the rest of the update loop
         if (GameManager.instance.isGameOver) return; // If the game is over, skip the rest of the update loop
-
         if (GameManager.instance.isPaused) return; // If the game is paused, skip the rest of the update loop
-
         if (this.cells == null || this.cells.Length == 0) return;  // Don't update if not initialized
 
         this.board.Clear(this); // Clears old positions on board when pieces move
@@ -55,73 +75,57 @@ public class Piece : MonoBehaviour
         this.lockTime += Time.deltaTime; // Increments lock time by the time since the last frame
 
 
-        if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            Rotate(-1);  // Rotate counterclockwise
-        }
+        if (controls.Gameplay.RotateLeft.WasPressedThisFrame())
+            Rotate(-1);
+        if (controls.Gameplay.RotateRight.WasPressedThisFrame())
+            Rotate(1);
+        if (controls.Gameplay.HardDrop.WasPressedThisFrame())
+            HardDrop();
+        if (controls.Gameplay.Hold.WasPressedThisFrame())
+            Hold();
 
-        if (Input.GetKeyDown(KeyCode.X))
+        if (controls.Gameplay.MoveLeft.WasPressedThisFrame())
         {
-            Rotate(1);   // Rotate clockwise
+            Move(Vector2Int.left);
+            lastMoveTime = Time.time + moveDelay;
         }
-
-        else if (Input.GetKeyDown(KeyCode.E))
+        else if (controls.Gameplay.MoveLeft.IsPressed() && Time.time >= lastMoveTime + moveDelay)
         {
-            this.Rotate(1);   // Rotate clockwise
-        }
-
-
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            Move(Vector2Int.left);  // Calls Move and passes in where I want to move as a parameter ((-1, 0) in this case)
-            lastMoveTime = Time.time; // Update last move time to the current time after a successful move
-        }
-        else if ((Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) && Time.time >= lastMoveTime + moveDelay) // If enough time has passed since the last move, allow for repeat movement when holding down the key
-        {
-            // Hold down key to move at intervals
             Move(Vector2Int.left);
             lastMoveTime = Time.time;
         }
 
-        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+        if (controls.Gameplay.MoveRight.WasPressedThisFrame())
         {
             Move(Vector2Int.right);
-            lastMoveTime = Time.time;
+            lastMoveTime = Time.time + moveDelay;
         }
-        else if ((Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) && Time.time >= lastMoveTime + moveDelay)
+        else if (controls.Gameplay.MoveRight.IsPressed() && Time.time >= lastMoveTime + moveDelay)
         {
             Move(Vector2Int.right);
             lastMoveTime = Time.time;
         }
 
-        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+        if (controls.Gameplay.SoftDrop.WasPressedThisFrame())
+        {
+            Move(Vector2Int.down);
+            lastMoveTime = Time.time + moveDelay;
+        }
+        else if (controls.Gameplay.SoftDrop.IsPressed() && Time.time >= lastMoveTime + moveDelay)
         {
             Move(Vector2Int.down);
             lastMoveTime = Time.time;
-        }
-        else if ((Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) && Time.time >= lastMoveTime + moveDelay)
-        {
-            Move(Vector2Int.down);
-            lastMoveTime = Time.time;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            HardDrop();
         }
 
         if (Time.time >= this.stepTime)
-        {
             Step();
-        }
 
-        this.board.Set(this);   // Sets pieces in new position
+        this.board.Set(this);
     }
 
     private void Step()
     {
         this.stepTime = Time.time + this.stepDelay; // Resets the step time to the current time plus the step delay (so it will fall after the step delay)
-
         Move(Vector2Int.down);
 
         if (this.lockTime >= this.lockDelay)
@@ -135,11 +139,13 @@ public class Piece : MonoBehaviour
         GameManager.instance.sfxAudioSource.PlayOneShot(GameManager.instance.lockSound); // Play lock sound when piece locks in place
         this.board.Set(this);   // Sets the piece in its final position on the board
         this.board.ClearLines(); // Clears any lines that are completed by this piece
+        this.board.ResetHold();
 
         if (!GameManager.instance.isGameOver) // Only spawn a new piece if the game isn't over
         {
             this.board.SpawnPiece(); // Spawns a new piece after locking the current piece in place
         }
+
     }
 
     private void HardDrop()
@@ -150,6 +156,12 @@ public class Piece : MonoBehaviour
         }
 
         Lock();
+    }
+
+    private void Hold()
+    {
+        if (!this.board.canHold) return;
+        this.board.HoldPiece();
     }
 
     private bool Move(Vector2Int translation)
@@ -275,5 +287,15 @@ public class Piece : MonoBehaviour
     public void UpdateStepDelay(float newStepDelay)
     {
         this.stepDelay = newStepDelay;
+    }
+
+    public void DisableControls()
+    {
+        controls.Gameplay.Disable();
+    }
+
+    public void EnableControls()
+    {
+        controls.Gameplay.Enable();
     }
 }
