@@ -4,11 +4,11 @@ using UnityEngine.InputSystem;
 
 public class Piece : MonoBehaviour
 {
-    public Board board { get; private set; }
-    public TetrominoData data { get; private set; }
-    public Vector3Int[] cells { get; private set; }
-    public Vector3Int position { get; private set; }
-    public int rotationIndex { get; private set; }
+    public Board Board { get; private set; }
+    public TetrominoData Data { get; private set; }
+    public Vector3Int[] Cells { get; private set; }
+    public Vector3Int Position { get; private set; }
+    public int RotationIndex { get; private set; }
 
     public float stepDelay = 0.8f;        // How long between automatic piece drops
     public float lockDelay = 0.5f;      // How long a piece sits before locking
@@ -29,7 +29,7 @@ public class Piece : MonoBehaviour
         controls.Gameplay.Pause.performed += ctx =>
         {
             if (GameManager.instance != null && GameManager.instance.gameStarted && !GameManager.instance.isGameOver)
-        GameManager.instance.TogglePause();
+                GameManager.instance.TogglePause();
         };
     }
 
@@ -45,22 +45,22 @@ public class Piece : MonoBehaviour
 
     public void Initialize(Board board, Vector3Int position, TetrominoData data)
     {
-        this.board = board;     // Shows which board it's on
-        this.position = position;       // Shows the position it's currently at
-        this.data = data;       // Shows what piece it's shaped like
-        this.rotationIndex = 0; // Resets the rotation to 0 on initialization
+        this.Board = board;     // Shows which board it's on
+        this.Position = position;       // Shows the position it's currently at
+        this.Data = data;       // Shows what piece it's shaped like
+        this.RotationIndex = 0; // Resets the rotation to 0 on initialization
         this.stepTime = Time.time + this.stepDelay; // Sets the step time to the current time plus the step delay (so it will fall after the step delay)
         this.lockTime = 0f;      // Resets the lock time to 0 on initialization
         this.moveCount = 0;     // Resets the move count to 0 on initialization
 
-        if (this.cells == null)
+        if (this.Cells == null)
         {
-            this.cells = new Vector3Int[data.cells.Length];
+            this.Cells = new Vector3Int[data.cells.Length];
         }
 
         for (int i = 0; i < data.cells.Length; i++)
         {
-            this.cells[i] = (Vector3Int)data.cells[i];
+            this.Cells[i] = (Vector3Int)data.cells[i];
         }
     }
 
@@ -69,9 +69,9 @@ public class Piece : MonoBehaviour
         if (GameManager.instance == null) return; // If GameManager instance doesn't exist yet, skip the rest of the update loop
         if (GameManager.instance.isGameOver) return; // If the game is over, skip the rest of the update loop
         if (GameManager.instance.isPaused) return; // If the game is paused, skip the rest of the update loop
-        if (this.cells == null || this.cells.Length == 0) return;  // Don't update if not initialized
+        if (this.Cells == null || this.Cells.Length == 0) return;  // Don't update if not initialized
 
-        this.board.Clear(this); // Clears old positions on board when pieces move
+        this.Board.Clear(this); // Clears old positions on board when pieces move
 
         this.lockTime += Time.deltaTime; // Increments lock time by the time since the last frame
 
@@ -121,7 +121,7 @@ public class Piece : MonoBehaviour
         if (Time.time >= this.stepTime)
             Step();
 
-        this.board.Set(this);
+        this.Board.Set(this);
     }
 
     private void Step()
@@ -138,13 +138,13 @@ public class Piece : MonoBehaviour
     private void Lock()
     {
         GameManager.instance.sfxAudioSource.PlayOneShot(GameManager.instance.lockSound); // Play lock sound when piece locks in place
-        this.board.Set(this);   // Sets the piece in its final position on the board
-        this.board.ClearLines(); // Clears any lines that are completed by this piece
-        this.board.ResetHold();
+        this.Board.Set(this);   // Sets the piece in its final position on the board
+        this.Board.ClearLines(); // Clears any lines that are completed by this piece
+        this.Board.ResetHold();
 
         if (!GameManager.instance.isGameOver) // Only spawn a new piece if the game isn't over
         {
-            this.board.SpawnPiece(); // Spawns a new piece after locking the current piece in place
+            this.Board.SpawnPiece(); // Spawns a new piece after locking the current piece in place
         }
 
     }
@@ -161,27 +161,27 @@ public class Piece : MonoBehaviour
 
     private void Hold()
     {
-        if (!this.board.canHold) return;
-        this.board.HoldPiece();
+        if (!this.Board.CanHold) return;
+        this.Board.HoldPiece();
     }
 
     private bool Move(Vector2Int translation)
     {
         // Calculate where the piece would move to
-        Vector3Int newPosition = this.position;
+        Vector3Int newPosition = this.Position;
         newPosition.x += translation.x; // Add horizontal movement (-1 for left, +1 for right)
         newPosition.y += translation.y; // Add vertical movement (for falling)
 
-        bool valid = this.board.IsValidPosition(this, newPosition);
+        bool valid = this.Board.IsValidPosition(this, newPosition);
 
         if (valid)
         {
-            this.position = newPosition;
+            this.Position = newPosition;
 
             // Check if piece is grounded (can't move down anymore)
-            Vector3Int below = this.position;
+            Vector3Int below = this.Position;
             below.y -= 1;
-            bool isGrounded = !this.board.IsValidPosition(this, below);
+            bool isGrounded = !this.Board.IsValidPosition(this, below);
 
             if (isGrounded)
             {
@@ -204,43 +204,43 @@ public class Piece : MonoBehaviour
 
     private void Rotate(int direction)
     {
-        int originalRotationIndex = this.rotationIndex;
-        this.rotationIndex = Wrap(this.rotationIndex + direction, 0, 4); // Wraps the rotation index between 0 and 3
+        int originalRotationIndex = this.RotationIndex;
+        this.RotationIndex = Wrap(this.RotationIndex + direction, 0, 4); // Wraps the rotation index between 0 and 3
 
         ApplyRotationMatrix(direction);
 
-        if (!TestWallKicks(this.rotationIndex, direction))
+        if (!TestWallKicks(this.RotationIndex, direction))
         {
-            this.rotationIndex = originalRotationIndex; // If rotation isn't valid, reset the rotation index
+            this.RotationIndex = originalRotationIndex; // If rotation isn't valid, reset the rotation index
             ApplyRotationMatrix(-direction); // Rotate back to original position
         }
     }
 
     private void ApplyRotationMatrix(int direction)
     {
-        for (int i = 0; i < this.cells.Length; i++)
+        for (int i = 0; i < this.Cells.Length; i++)
         {
-            Vector3 cell = this.cells[i];   // Get the current cell position (e.g., (1, 0, 0)). This creates a copy of that cell's position.
+            Vector3 cell = this.Cells[i];   // Get the current cell position (e.g., (1, 0, 0)). This creates a copy of that cell's position.
 
             int x, y;
 
-            switch (this.data.tetromino)
+            switch (this.Data.tetromino)
             {
                 case Tetromino.I:
                 case Tetromino.O:
                     cell.x -= 0.5f;
                     cell.y -= 0.5f;
-                    x = Mathf.CeilToInt((cell.x * Data.RotationMatrix[0] * direction) + (cell.y * Data.RotationMatrix[1] * direction));
-                    y = Mathf.CeilToInt((cell.x * Data.RotationMatrix[2] * direction) + (cell.y * Data.RotationMatrix[3] * direction));
+                    x = Mathf.CeilToInt((cell.x * global::Data.RotationMatrix[0] * direction) + (cell.y * global::Data.RotationMatrix[1] * direction));
+                    y = Mathf.CeilToInt((cell.x * global::Data.RotationMatrix[2] * direction) + (cell.y * global::Data.RotationMatrix[3] * direction));
                     break;
 
                 default:
-                    x = Mathf.RoundToInt((cell.x * Data.RotationMatrix[0] * direction) + (cell.y * Data.RotationMatrix[1] * direction));
-                    y = Mathf.RoundToInt((cell.x * Data.RotationMatrix[2] * direction) + (cell.y * Data.RotationMatrix[3] * direction));
+                    x = Mathf.RoundToInt((cell.x * global::Data.RotationMatrix[0] * direction) + (cell.y * global::Data.RotationMatrix[1] * direction));
+                    y = Mathf.RoundToInt((cell.x * global::Data.RotationMatrix[2] * direction) + (cell.y * global::Data.RotationMatrix[3] * direction));
                     break;
             }
 
-            this.cells[i] = new Vector3Int(x, y, 0);
+            this.Cells[i] = new Vector3Int(x, y, 0);
         }
     }
 
@@ -248,9 +248,9 @@ public class Piece : MonoBehaviour
     {
         int wallKickIndex = GetWallKickIndex(rotationIndex, rotationDirection);
 
-        for (int i = 0; i < this.data.wallKicks.GetLength(1); i++)
+        for (int i = 0; i < this.Data.wallKicks.GetLength(1); i++)
         {
-            Vector2Int translation = this.data.wallKicks[wallKickIndex, i];
+            Vector2Int translation = this.Data.wallKicks[wallKickIndex, i];
 
             if (Move(translation))
             {
@@ -270,7 +270,7 @@ public class Piece : MonoBehaviour
             wallKickIndex -= 1;
         }
 
-        return Wrap(wallKickIndex, 0, this.data.wallKicks.GetLength(0)); // Wrap the wall kick index to stay within bounds of the wall kick array
+        return Wrap(wallKickIndex, 0, this.Data.wallKicks.GetLength(0)); // Wrap the wall kick index to stay within bounds of the wall kick array
     }
 
     private int Wrap(int input, int min, int max)

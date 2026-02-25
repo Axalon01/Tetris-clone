@@ -56,17 +56,17 @@ public class GameManager : MonoBehaviour
     {
         // Play hover sound when selection changes for Game Over buttons
         if (isGameOver || isPaused)
-    {
-        GameObject currentSelected = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
-        
-        if (currentSelected != null && currentSelected != lastSelected)
         {
-            menuAudioSource.PlayOneShot(menuHoverSound);
+            GameObject currentSelected = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+
+            if (currentSelected != null && currentSelected != lastSelected)
+            {
+                menuAudioSource.PlayOneShot(menuHoverSound);
+            }
+
+            lastSelected = currentSelected;
         }
-        
-        lastSelected = currentSelected;
     }
-}
 
     public void TogglePause()
     {
@@ -108,9 +108,9 @@ public class GameManager : MonoBehaviour
         float newDelay = Mathf.Max(Mathf.Pow(0.8f - ((level - 1) * 0.007f), level - 1), 0.05f);
 
         // Tell the active piece to update
-        if (board != null && board.activePiece != null)
+        if (board != null && board.ActivePiece != null)
         {
-            board.activePiece.UpdateStepDelay(newDelay);
+            board.ActivePiece.UpdateStepDelay(newDelay);
         }
     }
 
@@ -171,7 +171,7 @@ public class GameManager : MonoBehaviour
         levelText.text = "1";
 
         // Clear the board
-        board.tilemap.ClearAllTiles();
+        board.Tilemap.ClearAllTiles();
         board.SpawnPiece();
     }
 

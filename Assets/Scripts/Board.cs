@@ -3,14 +3,17 @@ using UnityEngine.Tilemaps;
 
 public class Board : MonoBehaviour
 {
-    public Tilemap tilemap { get; private set; }
-    public Piece activePiece { get; private set; }
+    public Tilemap Tilemap { get; private set; }
+    public Piece ActivePiece { get; private set; }
     public TetrominoData[] tetrominoes;
+    public TetrominoData NextPiece { get; private set; }
+    private int[] bag;
+    private int bagIndex;
     public Vector3Int spawnPosition;
     public Vector2Int boardSize = new Vector2Int(10, 20);
     public TetrominoData heldPiece;
     public bool hasHeldPiece = false;
-    public bool canHold { get; private set; } = true;
+    public bool CanHold { get; private set; } = true;
 
     public RectInt Bounds   // This is a property, so it gets capitalized. A property looks like a variable, but runs code when accessed.
     {
@@ -23,8 +26,8 @@ public class Board : MonoBehaviour
 
     private void Awake()
     {
-        this.tilemap = GetComponentInChildren<Tilemap>();
-        this.activePiece = GetComponentInChildren<Piece>();
+        this.Tilemap = GetComponentInChildren<Tilemap>();
+        this.ActivePiece = GetComponentInChildren<Piece>();
 
         for (int i = 0; i < this.tetrominoes.Length; i++)
         {
@@ -33,19 +36,20 @@ public class Board : MonoBehaviour
             data.Initialize();
             this.tetrominoes[i] = data;
         }
-
+        InitBag();
+        NextPiece = DrawFromBag(); // Initialize the next piece so it's ready to go when the first piece spawns
     }
 
     public void SpawnPiece()
     {
-        int random = Random.Range(0, this.tetrominoes.Length);
-        TetrominoData data = this.tetrominoes[random];
+        TetrominoData data = NextPiece; // Use what was queued
+        NextPiece = DrawFromBag(); // Queue the next piece
 
-        this.activePiece.Initialize(this, this.spawnPosition, data);
+        this.ActivePiece.Initialize(this, this.spawnPosition, data);
 
-        if (IsValidPosition(this.activePiece, this.spawnPosition))
+        if (IsValidPosition(this.ActivePiece, this.spawnPosition))
         {
-            Set(this.activePiece);
+            Set(this.ActivePiece);
         }
         else
         {
@@ -53,51 +57,71 @@ public class Board : MonoBehaviour
         }
     }
 
+    private void InitBag()
+    {
+        bag = new int[] { 0, 1, 2, 3, 4, 5, 6 };
+        // Fisher-Yates shuffle
+        for (int i = bag.Length - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            int temp = bag[i];
+            bag[i] = bag[j];
+            bag[j] = temp;
+        }
+        bagIndex = 0;
+    }
+
+    private TetrominoData DrawFromBag()
+    {
+        if (bagIndex >= bag.Length) InitBag();
+        return tetrominoes[bag[bagIndex++]];
+    }
+
     public void HoldPiece()
     {
-        if (!canHold) return;
+        if (!CanHold) return;
 
         if (!hasHeldPiece)
         {
             // Nothing held yet: Save current piece and spawn a new random one
-            heldPiece = this.activePiece.data;
+            heldPiece = this.ActivePiece.Data;
             hasHeldPiece = true;
-            Clear(this.activePiece);
+            Clear(this.ActivePiece);
             SpawnPiece();
         }
         else
         {
             // Swap current piece with held data
-            TetrominoData temp = this.activePiece.data;
-            Clear(this.activePiece);        // Remove the old piece from the board
-            this.activePiece.Initialize(this, this.spawnPosition, heldPiece);
+            TetrominoData temp = this.ActivePiece.Data;
+            Clear(this.ActivePiece);        // Remove the old piece from the board
+            this.ActivePiece.Initialize(this, this.spawnPosition, heldPiece);
             heldPiece = temp;
-            Set(this.activePiece);
+            Set(this.ActivePiece);
         }
 
-        canHold = false;
+        CanHold = false;
     }
 
     public void ResetHold()
     {
-        canHold = true;
+        CanHold = true;
     }
 
     public void Set(Piece piece)
     {
-        for (int i = 0; i < piece.cells.Length; i++)
+        for (int i = 0; i < piece.Cells.Length; i++)
         {
-            Vector3Int tilePosition = piece.cells[i] + piece.position;
-            this.tilemap.SetTile(tilePosition, piece.data.tile);
+            Vector3Int tilePosition = piece.Cells[i] + piece.Position;
+            this.Tilemap.SetTile(tilePosition, piece.Data.tile);
         }
     }
 
     public void Clear(Piece piece)
     {
-        for (int i = 0; i < piece.cells.Length; i++)
+        for (int i = 0; i < piece.Cells.Length; i++)
         {
-            Vector3Int tilePosition = piece.cells[i] + piece.position;
-            this.tilemap.SetTile(tilePosition, null);       // Sets the piece data as null so this can unset the position when it moves to a new one
+            Vector3Int tilePosition = piece.Cells[i] + piece.Position;
+            this.Tilemap.SetTile(tilePosition, null);       // Sets the piece data as null so this can unset the position when it moves to a new one
         }
     }
 
@@ -105,16 +129,16 @@ public class Board : MonoBehaviour
     {
         RectInt bounds = this.Bounds;
 
-        for (int i = 0; i < piece.cells.Length; i++)
+        for (int i = 0; i < piece.Cells.Length; i++)
         {
-            Vector3Int tilePosition = piece.cells[i] + position;
+            Vector3Int tilePosition = piece.Cells[i] + position;
 
             if (!bounds.Contains((Vector2Int)tilePosition)) // If the position is NOT within the bounds
             {
                 return false;   // Movement isn't valid
             }
 
-            if (this.tilemap.HasTile(tilePosition))
+            if (this.Tilemap.HasTile(tilePosition))
             {
                 return false;
             }
@@ -159,7 +183,7 @@ public class Board : MonoBehaviour
         {
             Vector3Int position = new Vector3Int(col, row, 0);
 
-            if (!this.tilemap.HasTile(position))
+            if (!this.Tilemap.HasTile(position))
             {
                 return false;
             }
@@ -175,7 +199,7 @@ public class Board : MonoBehaviour
         for (int col = bounds.xMin; col < bounds.xMax; col++)
         {
             Vector3Int position = new Vector3Int(col, row, 0);
-            this.tilemap.SetTile(position, null);
+            this.Tilemap.SetTile(position, null);
         }
 
         while (row < bounds.yMax)
@@ -183,10 +207,10 @@ public class Board : MonoBehaviour
             for (int col = bounds.xMin; col < bounds.xMax; col++)
             {
                 Vector3Int position = new Vector3Int(col, row + 1, 0);
-                TileBase above = this.tilemap.GetTile(position);
+                TileBase above = this.Tilemap.GetTile(position);
 
                 position = new Vector3Int(col, row, 0);
-                this.tilemap.SetTile(position, above);
+                this.Tilemap.SetTile(position, above);
             }
 
             row++;

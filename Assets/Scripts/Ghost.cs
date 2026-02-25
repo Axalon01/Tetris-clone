@@ -7,24 +7,24 @@ public class Ghost : MonoBehaviour
     public Board board;
     public Piece trackingPiece;
 
-    public Tilemap tilemap { get; private set; }
-    public Vector3Int[] cells { get; private set; }
-    public Vector3Int position { get; private set; }
+    public Tilemap Tilemap { get; private set; }
+    public Vector3Int[] Cells { get; private set; }
+    public Vector3Int Position { get; private set; }
 
     private void Awake()
     {
-        this.tilemap = GetComponentInChildren<Tilemap>();
+        this.Tilemap = GetComponentInChildren<Tilemap>();
     }
 
     private void LateUpdate()
     {
         // Null check for tracking piece (in case it hasn't been initialized yet)
-        if (this.trackingPiece.cells == null || this.trackingPiece.cells.Length == 0) return;
+        if (this.trackingPiece.Cells == null || this.trackingPiece.Cells.Length == 0) return;
 
         // Initialize cells if needed
-        if (this.cells == null || this.cells.Length == 0)
+        if (this.Cells == null || this.Cells.Length == 0)
         {
-            this.cells = new Vector3Int[this.trackingPiece.cells.Length];
+            this.Cells = new Vector3Int[this.trackingPiece.Cells.Length];
         }
 
         Clear();
@@ -35,24 +35,24 @@ public class Ghost : MonoBehaviour
 
     private void Clear()
     {
-        for (int i = 0; i < this.cells.Length; i++)
+        for (int i = 0; i < this.Cells.Length; i++)
         {
-            Vector3Int tilePosition = this.cells[i] + this.position;
-            this.tilemap.SetTile(tilePosition, null);
+            Vector3Int tilePosition = this.Cells[i] + this.Position;
+            this.Tilemap.SetTile(tilePosition, null);
         }
     }
 
     private void Copy()
     {
-        for (int i = 0; i < this.cells.Length; i++)
+        for (int i = 0; i < this.Cells.Length; i++)
         {
-            this.cells[i] = trackingPiece.cells[i];
+            this.Cells[i] = trackingPiece.Cells[i];
         }
     }
 
     private void Drop()
     {
-        Vector3Int position = this.trackingPiece.position;
+        Vector3Int position = this.trackingPiece.Position;
 
         int current = position.y;
         int bottom = -this.board.boardSize.y / 2 - 1;
@@ -65,7 +65,7 @@ public class Ghost : MonoBehaviour
 
             if (this.board.IsValidPosition(this.trackingPiece, position))
             {
-                this.position = position;
+                this.Position = position;
             }
             else
             {
@@ -78,10 +78,10 @@ public class Ghost : MonoBehaviour
 
     private void Set()
     {
-        for (int i = 0; i < this.cells.Length; i++)
+        for (int i = 0; i < this.Cells.Length; i++)
         {
-            Vector3Int tilePosition = this.cells[i] + this.position;
-            this.tilemap.SetTile(tilePosition, this.tile);
+            Vector3Int tilePosition = this.Cells[i] + this.Position;
+            this.Tilemap.SetTile(tilePosition, this.tile);
         }
     }
 }
