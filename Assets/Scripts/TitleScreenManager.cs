@@ -8,6 +8,8 @@ public class TitleScreenManager : MonoBehaviour
     public GameObject titlePanel;
     public GameObject greyCoverPanel;
     public GameObject infoPanelCover;
+    public GameObject holdPanelCover;
+    public GameObject previewPanelCover;
     public GameObject controlsPanel;
     public Board board;
     public AudioSource musicSource;
@@ -19,9 +21,11 @@ public class TitleScreenManager : MonoBehaviour
     public TextMeshProUGUI highScore2Text;
     public TextMeshProUGUI highScore3Text;
     public Button controlsButton;
-    
+
     private CanvasGroup titleCanvasGroup;
     private CanvasGroup controlsCanvasGroup;
+    private CanvasGroup holdCoverCanvasGroup;
+    private CanvasGroup previewCoverCanvasGroup;
 
     private void Start()
     {
@@ -32,11 +36,11 @@ public class TitleScreenManager : MonoBehaviour
         titleCanvasGroup = titlePanel.GetComponent<CanvasGroup>();
         if (titleCanvasGroup == null)
             titleCanvasGroup = titlePanel.AddComponent<CanvasGroup>();
-    
+
         controlsCanvasGroup = controlsPanel.GetComponent<CanvasGroup>();
         if (controlsCanvasGroup == null)
             controlsCanvasGroup = controlsPanel.AddComponent<CanvasGroup>();
-            
+
         // Load and display high scores
         int score1 = PlayerPrefs.GetInt("HighScore1", 0);
         int score2 = PlayerPrefs.GetInt("HighScore2", 0);
@@ -93,7 +97,7 @@ public class TitleScreenManager : MonoBehaviour
         titleCanvasGroup.alpha = 0f;
         titlePanel.SetActive(false); // Hide title panel
 
-        // Fade out grey cover, info panel cover
+        // Fade out grey cover, info panel cover, hold panel cover, and preview panel cover 
         elapsed = 0f;
         CanvasGroup coverCanvasGroup = greyCoverPanel.GetComponent<CanvasGroup>();
         if (coverCanvasGroup == null)
@@ -103,6 +107,14 @@ public class TitleScreenManager : MonoBehaviour
         if (infoCoverCanvasGroup == null)
             infoCoverCanvasGroup = infoPanelCover.AddComponent<CanvasGroup>();
 
+        CanvasGroup holdCoverCanvasGroup = holdPanelCover.GetComponent<CanvasGroup>();
+        if (holdCoverCanvasGroup == null)
+            holdCoverCanvasGroup = holdPanelCover.AddComponent<CanvasGroup>();
+
+        CanvasGroup previewCoverCanvasGroup = previewPanelCover.GetComponent<CanvasGroup>();
+        if (previewCoverCanvasGroup == null)
+            previewCoverCanvasGroup = previewPanelCover.AddComponent<CanvasGroup>();
+
         while (elapsed < duration)
         {
             elapsed += Time.unscaledDeltaTime;
@@ -110,6 +122,8 @@ public class TitleScreenManager : MonoBehaviour
 
             coverCanvasGroup.alpha = 1f - progress; // Fade out grey title cover
             infoCoverCanvasGroup.alpha = 1f - progress; // Fade out info panel cover
+            holdCoverCanvasGroup.alpha = 1f - progress; // Fade out hold panel cover
+            previewCoverCanvasGroup.alpha = 1f - progress; // Fade out preview panel cover
 
             yield return null;
         }
@@ -150,7 +164,7 @@ public class TitleScreenManager : MonoBehaviour
         {
             if (fadeInObj != null)
                 fadeInObj.SetActive(true);
-            
+
             elapsed = 0f;
             fadeIn.alpha = 0f;
 
@@ -165,9 +179,9 @@ public class TitleScreenManager : MonoBehaviour
 
         // Re-select appropriate button when fading back to title
         if (fadeInObj == titlePanel && controlsButton != null)
-{
-        // Coming back to title - select Controls button
-        UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(controlsButton.gameObject);
-}
+        {
+            // Coming back to title - select Controls button
+            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(controlsButton.gameObject);
+        }
     }
 }
