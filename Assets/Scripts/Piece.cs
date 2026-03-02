@@ -15,9 +15,11 @@ public class Piece : MonoBehaviour
 
     private float stepTime;     // Time before the next drop should happen
     private float lockTime;     // Tracks how long the piece has been grounded
+    private float softDropTimer = 0f;
+    private float softDropInterval = 0.05f;
     private int moveCount = 0;
     private const int MaxMovesBeforeLockReset = 15;
-    private float moveDelay = 0.1f;    // Minimum time between repeat moves
+    private float moveDelay = 0.05f;    // Minimum time between repeat moves
     private float lastMoveTime;    // Time when the last move was made
 
     private TetrisControls controls;
@@ -109,13 +111,20 @@ public class Piece : MonoBehaviour
 
         if (controls.Gameplay.SoftDrop.WasPressedThisFrame())
         {
-            Move(Vector2Int.down);
-            lastMoveTime = Time.time + moveDelay;
+            softDropTimer = softDropInterval; // Fire immediately on first press
         }
-        else if (controls.Gameplay.SoftDrop.IsPressed() && Time.time >= lastMoveTime + moveDelay)
+        if (controls.Gameplay.SoftDrop.IsPressed())
         {
-            Move(Vector2Int.down);
-            lastMoveTime = Time.time;
+            softDropTimer += Time.deltaTime;
+            if (softDropTimer >= softDropInterval)
+            {
+                Move(Vector2Int.down);
+                softDropTimer = 0f;
+            }
+        }
+        else
+        {
+            softDropTimer = 0f;
         }
 
         if (Time.time >= this.stepTime)

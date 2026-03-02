@@ -104,6 +104,17 @@
                 },
                 {
                     "name": "",
+                    "id": "d058ce90-45d4-4d87-9681-06e1afdbfedb",
+                    "path": "<Gamepad>/leftStick/left",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MoveLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "cd54d4ae-50a7-4dbb-8b55-9985c05b0dbe",
                     "path": "<Gamepad>/dpad/right",
                     "interactions": "",
@@ -126,6 +137,17 @@
                 },
                 {
                     "name": "",
+                    "id": "03c16316-f577-4038-9bda-8d7a1a7a3fcd",
+                    "path": "<Gamepad>/leftStick/right",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MoveRight",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "1efdb42b-61c3-4b5b-ad73-056bd5159fa9",
                     "path": "<Gamepad>/dpad/down",
                     "interactions": "",
@@ -139,6 +161,17 @@
                     "name": "",
                     "id": "4e27fadc-ee29-4274-9b5c-ba1aa5a0c898",
                     "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SoftDrop",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "79683857-99d3-4d96-95e9-9d31d366e6c5",
+                    "path": "<Gamepad>/leftStick/down",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -227,6 +260,17 @@
                     "name": "",
                     "id": "d95a238a-6e7d-4c44-89a1-08ae96448544",
                     "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Hold",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "563ab8d7-3243-4927-9e31-740e51d94242",
+                    "path": "<Gamepad>/leftShoulder",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
