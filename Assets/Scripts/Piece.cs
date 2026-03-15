@@ -19,7 +19,10 @@ public class Piece : MonoBehaviour
     private float softDropInterval = 0.05f;
     private int moveCount = 0;
     private const int MaxMovesBeforeLockReset = 15;
-    private float moveDelay = 0.05f;    // Minimum time between repeat moves
+    private float dasDelay = 0.2f;  // Initial delay before repeat starts
+    private float dasInterval = 0.05f;  // Repeat rate once DAS (Delayed Auto Shift) kicks in
+    private float dasTimer = 0f;
+    private bool dasActive = false;
     private float lastMoveTime;    // Time when the last move was made
 
     private TetrisControls controls;
@@ -90,23 +93,43 @@ public class Piece : MonoBehaviour
         if (controls.Gameplay.MoveLeft.WasPressedThisFrame())
         {
             Move(Vector2Int.left);
-            lastMoveTime = Time.time + moveDelay;
+            dasTimer = 0f;
+            dasActive = false;
         }
-        else if (controls.Gameplay.MoveLeft.IsPressed() && Time.time >= lastMoveTime + moveDelay)
+        else if (controls.Gameplay.MoveLeft.IsPressed())
         {
-            Move(Vector2Int.left);
-            lastMoveTime = Time.time;
+            dasTimer += Time.deltaTime;
+            if (!dasActive && dasTimer >= dasDelay)
+            {
+                dasActive = true;
+                dasTimer = 0f;
+            }
+            if (dasActive && dasTimer >= dasInterval)
+            {
+                Move(Vector2Int.left);
+                dasTimer = 0f;
+            }
         }
 
         if (controls.Gameplay.MoveRight.WasPressedThisFrame())
         {
             Move(Vector2Int.right);
-            lastMoveTime = Time.time + moveDelay;
+            dasTimer = 0f;
+            dasActive = false;
         }
-        else if (controls.Gameplay.MoveRight.IsPressed() && Time.time >= lastMoveTime + moveDelay)
+        else if (controls.Gameplay.MoveRight.IsPressed())
         {
-            Move(Vector2Int.right);
-            lastMoveTime = Time.time;
+            dasTimer += Time.deltaTime;
+            if (!dasActive && dasTimer >= dasDelay)
+            {
+                dasActive = true;
+                dasTimer = 0f;
+            }
+            if (dasActive && dasTimer >= dasInterval)
+            {
+                Move(Vector2Int.right);
+                dasTimer = 0f;
+            }
         }
 
         if (controls.Gameplay.SoftDrop.WasPressedThisFrame())
