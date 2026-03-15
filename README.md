@@ -23,3 +23,6 @@ Grab the latest build for Windows or Mac from the [Releases](https://github.com/
 **Sound Effects**
 - Lock SFX — [acclivity](https://freesound.org/people/acclivity/sounds/25880/)
 - Line Clear SFX — [Mixkit](https://mixkit.co/free-sound-effects/coin/)
+
+**Sprites**
+- [zigurous](https://github.com/zigurous/unity-tetris-tutorial/tree/main/Assets/Sprites)
